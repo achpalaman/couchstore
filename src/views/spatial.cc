@@ -25,6 +25,7 @@
 #include "../bitfield.h"
 #include "../couch_btree.h"
 #include <platform/cbassert.h>
+#include <vector>
 
 
 #define BYTE_PER_COORD sizeof(uint32_t)
@@ -258,6 +259,30 @@ STATIC couchstore_error_t encode_spatial_key(const sized_mbb_t *mbb,
 /* Expands the `original` MBB with the `expander` */
 STATIC couchstore_error_t expand_mbb(sized_mbb_t *original,
                                      sized_mbb_t *expander) {
+    uint16_t i;
+
+    cb_assert(original->num == expander->num);
+
+    // Temperory store for expander values
+    std::vector<double> temp(original->num);
+    for (i = 0; i < original->num; ++i) {
+        if (i % 2 == 0) {
+            temp[i] = MIN(original->mbb[i], expander->mbb[i]);
+        } else {
+            temp[i] = MAX(original->mbb[i], expander->mbb[i]);
+        }
+    }
+
+    for (i = 0; i < original->num; ++i) {
+        original->mbb[i] = temp[i];
+    }
+
+    return COUCHSTORE_SUCCESS;
+}
+
+/* Old versin of expand mbb code */
+couchstore_error_t old_expand_mbb(sized_mbb_t *original,
+                                     sized_mbb_t *expander) {
     int i;
 
     cb_assert(original->num == expander->num);
@@ -272,6 +297,7 @@ STATIC couchstore_error_t expand_mbb(sized_mbb_t *original,
 
     return COUCHSTORE_SUCCESS;
 }
+
 
 
 /* This reduce function is also used for the re-reduce */

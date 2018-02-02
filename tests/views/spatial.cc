@@ -379,3 +379,33 @@ void test_expand_mbb()
     expand_mbb(&mbb_struct_a, &mbb_struct_b);
     cb_assert(is_double_array_equal(mbb_struct_a.mbb, expected2_mbb, 6));
 }
+
+
+void test_expand_mbb_optimization()
+{
+    extern couchstore_error_t old_expand_mbb(sized_mbb_t *, sized_mbb_t *);
+    sized_mbb_t original_mbb, expander_mbb;
+
+    original_mbb.num = expander_mbb.num = 6;
+    original_mbb.mbb = new double[6];
+    expander_mbb.mbb = new double[6];
+
+    original_mbb.mbb[0] = 82;
+    original_mbb.mbb[1] = 82;
+    original_mbb.mbb[2] = 602;
+    original_mbb.mbb[3] = 602;
+    original_mbb.mbb[4] = 1;
+    original_mbb.mbb[5] = 9;
+
+    expander_mbb.mbb[0] = 486;
+    expander_mbb.mbb[1] = 486;
+    expander_mbb.mbb[2] = 4588;
+    expander_mbb.mbb[3] = 4588;
+    expander_mbb.mbb[4] = 1;
+    expander_mbb.mbb[5] = 12;
+
+    old_expand_mbb(&original_mbb, &expander_mbb);
+
+    delete [] original_mbb.mbb;
+    delete [] expander_mbb.mbb;
+}

@@ -46,4 +46,5 @@ void view_tests()
     test_encode_spatial_key();
     test_decode_spatial_key();
     test_expand_mbb();
+    test_expand_mbb_optimization();
 }
